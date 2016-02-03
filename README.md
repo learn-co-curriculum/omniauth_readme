@@ -36,6 +36,57 @@ Here's how it works from the user's standpoint:
 
 Let's see how this works in practice:
 
+## Omniauth with Facebook
+
+The Omniauth gem allows up to use the oauth protocol with a number of different providers.  All we need to do is add the gem specific to the provider we want to use in addition to the omniauth gem, in this case
+add `omniauth` and `omniauth-facebook` to your Gemfile and `bundle`.  We can add as many additional omniauth gems if you want multiple provider login in our app. 
+
+First we'll need to tell omniauth about our app's oauth credentials.
+
+Create `config/initializers/omniauth.rb`. It will contain this:
+```ruby
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :facebook, ENV['FACEBOOK_KEY'], ENV['FACEBOOK_SECRET']
+    end
+```
+The ENV constant refers to a global hash for your entire computer environment.  You can store any key value pairs in this environment and so it's a very useful place to store credentials that we don't want to be managed by git and later stored on github (if your repo is public).  The most common error we see from students here is that when ENV["PROVIDER_KEY"] is evaluated in the initializer it returns nil!  Then later when you try and authenticate with the provider you'll get some kind of 4xx error because the provider doesn't recognize your app.
+
+To recieve these credentials, each provider's process is different, but you'll essentially need to register your app with the provider and they'll give you a set of keys specific to your app.
+
+For Facebook:
+Log in to [the Facebook developer's panel][facebook_dev]. Create an app, copy the key (it's called "App ID" on Facebook's page) and the secret and set them as environment variables in the terminal:
+
+    export FACEBOOK_KEY=<your_key>
+    export FACEBOOK_SECRET=<your_key>
+
+Running these commands will make these key value pairs appear in the ENV hash in ruby in that terminal.  A more lasting way to do this is using the Figaro or Dotenv gems.
+
+Jump into the console to check that you have set the keys properly.  If `ENV["FACEBOOK_KEY"]` and `ENV["FACEBOOK_SECRET"]` return your keys you're all set!
+
+We now need to create a link that will take the user to facebook to login.  Create a link anywhere you'd like that sends the user to "/auth/facebook".  We'll need a route, a controller and a view, I'll only show the view.
+
+```ruby
+  #\views\static\home.html.erb
+  <%= link_to("login with facebook!", "/auth/facebook") %>
+
+
+Then run `rails s` again.
+
+Create a `SessionsController`. This will be simpler than ones we've made in the past. This time, we won't log you in at all, we'll just print all the information in the `request.env['omniauth.auth']` hash. The tests verify that the controller sets the appropriate variable for the views; ensure they pass.
+
+There is already a view that outputs all the authentication data, as well as showing you the user's photo if one is provided.
+
+We're not logging anyone in now. But if we were, it wouldn't be hard. You can trust the data coming in from `request.env['omniauth.auth']`, at least as far as you can trust the authentication provider.
+
+For extra fun, try editing your initializer to look like this:
+
+    Rails.application.config.middleware.use OmniAuth::Builder do
+      provider :facebook, ENV['FACEBOOK_KEY'], ENV['FACEBOOK_SECRET'],
+               info_fields: ['name', 'email', 'age_range', 'context'].join(',')
+    end
+
+You can add more fields from the list [here][facebook_info_fields], and see what Facebook has to say about you.
+
 And here's how it works from your standpoint:
 
   1. You add the Omniauth gem.
