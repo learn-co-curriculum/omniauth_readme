@@ -70,7 +70,7 @@ We now need to create a link that will take the user to Facebook to login.  Crea
 ```ruby
   #\views\static\home.html.erb
   <%= link_to("login with facebook!", "/auth/facebook") %>
-
+```
 **Hot-Tip**
 Log out of Facebook before you do this portion so you can see the full flow.
 
