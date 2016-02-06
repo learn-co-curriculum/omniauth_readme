@@ -144,7 +144,7 @@ Let's log the user in! (We've omitted the model related code)
 class SessionsController < ApplicationController
 
   def create
-    user = User.find_or_create_by_uid(auth['uid']) do |u|
+    user = User.find_or_create_by(uid => auth['uid']) do |u|
       u.info = auth['info']['name']
       u.email = auth['info']['email']
     end
@@ -169,3 +169,4 @@ Implementing the oauth protocol yourself is extremely complicated.  Using the om
 [CAPTCHA]: [https://en.wikipedia.org/wiki/CAPTCHA]
 [yak]: [https://en.wiktionary.org/wiki/yak_shaving]
 [omniauth]: https://github.com/intridea/omniauth
+<p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
