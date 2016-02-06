@@ -38,7 +38,7 @@ Let's see how this works in practice:
 
 ## Omniauth with Facebook
 
-The Omniauth gem allows up to use the oauth protocol with a number of different providers.  All we need to do is add the gem specific to the provider we want to use in addition to the omniauth gem, in this case
+The Omniauth gem allows us to use the oauth protocol with a number of different providers.  All we need to do is add the gem specific to the provider we want to use in addition to the omniauth gem, in this case
 add `omniauth` and `omniauth-facebook` to your Gemfile and `bundle`.  We can add as many additional omniauth gems if you want multiple provider login in our app. 
 
 First we'll need to tell omniauth about our app's oauth credentials.
@@ -169,3 +169,4 @@ Implementing the oauth protocol yourself is extremely complicated.  Using the om
 [CAPTCHA]: [https://en.wikipedia.org/wiki/CAPTCHA]
 [yak]: [https://en.wiktionary.org/wiki/yak_shaving]
 [omniauth]: https://github.com/intridea/omniauth
+<p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
