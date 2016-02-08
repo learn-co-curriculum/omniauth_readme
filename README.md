@@ -54,7 +54,7 @@ The ENV constant refers to a global hash for your entire computer environment.  
 To recieve these credentials, each provider's process is different, but you'll essentially need to register your app with the provider and they'll give you a set of keys specific to your app.
 
 For Facebook:
-Log in to [the Facebook developer's panel][facebook_dev]. Create an app, copy the key (it's called "App ID" on Facebook's page) and the secret and set them as environment variables in the terminal:
+Log in to [the Facebook developer's panel](https://developers.facebook.com). Create an app, copy the key (it's called "App ID" on Facebook's page) and the secret and set them as environment variables in the terminal:
 
     export FACEBOOK_KEY=<your_key>
     export FACEBOOK_SECRET=<your_key>
@@ -169,3 +169,4 @@ Implementing the oauth protocol yourself is extremely complicated.  Using the om
 [CAPTCHA]: [https://en.wikipedia.org/wiki/CAPTCHA]
 [yak]: [https://en.wiktionary.org/wiki/yak_shaving]
 [omniauth]: https://github.com/intridea/omniauth
+<p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
