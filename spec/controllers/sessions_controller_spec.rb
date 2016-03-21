@@ -12,7 +12,6 @@ RSpec.describe SessionsController, type: :controller do
       }
       @request.env['omniauth.auth'] = auth_data
       get :create
-      # binding.pry
       expect(subject.auth).to eq(auth_data)
     end
   end

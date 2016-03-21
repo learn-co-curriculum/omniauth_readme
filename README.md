@@ -16,7 +16,7 @@ And then on the server, you have to manage all these passwords. You have to stor
 
 What if it could be someone else's problem?
 
-Like Google, for example. They are dealing with all these problems somehow (having a huge amount of money helps). For example, when you log into Google, they are looking at vastly more than your username and password. Google considers where you are in the world (they can [guess based on your IP address][ip_geolocation], the operating system you're running (their servers can tell because they [listen very carefully to your computer's accent when it talks to them][ip_fingerprinting]), and numerous other factors. If the login looks suspicious—like you usually log in on a Mac in New York, but today you're logging in on a Windows XP machine in Thailand—they may reject it, or ask you to solve a [CAPTCHA].
+Like Google, for example. They are dealing with all these problems somehow (having a huge amount of money helps). For example, when you log into Google, they are looking at vastly more than your username and password. Google considers where you are in the world (they can [guess based on your IP address][ip_geolocation], the operating system you're running (their servers can tell because they [listen very carefully to your computer's accent when it talks to them][IP_stack_fingerprinting]), and numerous other factors. If the login looks suspicious—like you usually log in on a Mac in New York, but today you're logging in on a Windows XP machine in Thailand—they may reject it, or ask you to solve a [captcha][CAPTCHA].
 
 Wouldn't it be nice if your users could use their Google—or Twitter, or Facebook—login for your site?
 
@@ -145,7 +145,7 @@ class SessionsController < ApplicationController
 
   def create
     user = User.find_or_create_by(uid => auth['uid']) do |u|
-      u.info = auth['info']['name']
+      u.name = auth['info']['name']
       u.email = auth['info']['email']
     end
     session[:user_id] = user.id
@@ -165,8 +165,8 @@ That completes the whole oauth login flow!
 Implementing the oauth protocol yourself is extremely complicated.  Using the omniauth gem along with the omniauth-provider gem for the provider you'd like to allow users to log in to your site with makes the process a lot easier, but it still trips a lot of people up!  Make sure you understand each piece of the flow, what you expect to happen, and any deviance from the expected result.  The end result should be getting access to the users data from the provider in your sessions controller where you can decide what to do with it, which is usually either creating a user in your database using their provider data, and/or logging them in.
 
 [ip_geolocation]: https://en.wikipedia.org/wiki/Geolocation
-[ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting]
-[CAPTCHA]: [https://en.wikipedia.org/wiki/CAPTCHA]
-[yak]: [https://en.wiktionary.org/wiki/yak_shaving]
+[ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
+[CAPTCHA]: https://en.wikipedia.org/wiki/CAPTCHA
+[yak]: https://en.wiktionary.org/wiki/yak_shaving
 [omniauth]: https://github.com/intridea/omniauth
 <p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
