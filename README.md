@@ -165,8 +165,8 @@ That completes the whole oauth login flow!
 Implementing the oauth protocol yourself is extremely complicated.  Using the omniauth gem along with the omniauth-provider gem for the provider you'd like to allow users to log in to your site with makes the process a lot easier, but it still trips a lot of people up!  Make sure you understand each piece of the flow, what you expect to happen, and any deviance from the expected result.  The end result should be getting access to the users data from the provider in your sessions controller where you can decide what to do with it, which is usually either creating a user in your database using their provider data, and/or logging them in.
 
 [ip_geolocation]: https://en.wikipedia.org/wiki/Geolocation
-[ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting]
-[CAPTCHA]: [https://en.wikipedia.org/wiki/CAPTCHA]
-[yak]: [https://en.wiktionary.org/wiki/yak_shaving]
+[ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
+[CAPTCHA]: https://en.wikipedia.org/wiki/CAPTCHA
+[yak]: https://en.wiktionary.org/wiki/yak_shaving
 [omniauth]: https://github.com/intridea/omniauth
 <p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
