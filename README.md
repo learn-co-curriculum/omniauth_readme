@@ -168,6 +168,9 @@ Implementing the OAuth protocol yourself is extremely complicated. Using the Omn
 
 * [Omniauth](https://github.com/learn-co-curriculum/omniauth-review-lecture-in-todomvc)
 
+## Resources
+* [Managing Environment Variables](https://launchschool.com/blog/managing-environment-configuration-variables-in-rails)
+
 [ip_geolocation]: https://en.wikipedia.org/wiki/Geolocation
 [ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
 [CAPTCHA]: https://en.wikipedia.org/wiki/CAPTCHA
@@ -175,3 +178,5 @@ Implementing the OAuth protocol yourself is extremely complicated. Using the Omn
 [omniauth]: https://github.com/intridea/omniauth
 
 <p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme' title='Omniauth'>Omniauth</a> on Learn.co and start learning to code for free.</p>
+
+<p class='util--hide'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
