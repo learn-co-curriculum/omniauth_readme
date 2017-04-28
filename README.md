@@ -60,11 +60,11 @@ export FACEBOOK_KEY=<your_key>
 export FACEBOOK_SECRET=<your_key>
 ```
 
-We've included a [quick video](https://youtu.be/1yryyKB7Edk) as this often trips people up (including experienced folks). Make sure you do the last two steps of setting your URL and valid domains. If you don't, Facebook will think you're making a request from an invalid site and will never let the user log in.
+We've included a [quick video](https://youtu.be/1yryyKB7Edk) as this often trips people up (including experienced folks). The interface has changed somewhat, so in order to accoplish the last steps of the video, "Add product" to your facebook app, choose "Facebook Login" and add `localhost:3000` to your "Valid OAuth redirect URIs".  If you don't, Facebook will think you're making a request from an invalid site and will never let the user log in.
 
-Running these commands will make these key-value pairs appear in the ENV hash in Ruby in that terminal. A more lasting way to do this is using the Figaro or Dotenv gems.
+Running these commands will make these key-value pairs appear in the ENV hash in Ruby in that terminal. A more lasting way to do this is using the Figaro or Dotenv gems. **Note** Because the ENV hash is not lasting, you need to run your `rails s` in the same bash session in which you export your `FACEBOOK_SECRET` and `FACEBOOK_KEY`
 
-Jump into the console to check that you have set the keys properly. If `ENV["FACEBOOK_KEY"]` and `ENV["FACEBOOK_SECRET"]` return your keys you're all set!
+Jump into the console to check that you have set the keys properly. If `printenv FACEBOOK_KEY` and `printenv FACEBOOK_SECRET` return your keys you're all set!
 
 We now need to create a link that will take the user to Facebook to login.  Create a link anywhere you'd like that sends the user to "/auth/facebook". We'll need a route, a controller, and a view. I'll only show the view.
 
