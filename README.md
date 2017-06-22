@@ -1,12 +1,13 @@
 # OmniAuth
 
 ## Objectives
-  1. Describe the problem of authentication and how OmniAuth solves it.
-  2. Explain an OmniAuth strategy.
-  3. Use OmniAuth to handle authentication in a Rails server.
+1. Describe the problem of authentication and how OmniAuth solves it.
+2. Explain an OmniAuth strategy.
+3. Use OmniAuth to handle authentication in a Rails server.
+
+There are no tests for this lesson, but code along as we learn about OmniAuth and build out a login strategy together!
 
 ## Overview
-
 Passwords are terrible.
 
 For one thing, you have to remember them. Or you have to use a password manager, which comes with its own problems. Unsurprisingly, some percentage of users will just leave and never come back the moment you ask them to create an account.
@@ -22,21 +23,18 @@ Wouldn't it be nice if your users could use their Google — or Twitter, Faceboo
 Of course, you know this is possible. It's becoming increasingly rare to find a modern website that _doesn't_ allow users to login via a third-party account. Today, we're going to talk about how to add this feature to your Rails applications.
 
 ## OmniAuth
-
-[OmniAuth][omniauth] is a gem for Rails that lets you use multiple authentication providers alongside the more traditional username/password setup. Each authentication provider (e.g., using a Facebook account) is called a _strategy_. The OmniAuth wiki keeps [an up-to-date list of strategies][list_of_strategies], both official (provided directly by the service, such as GitHub, Heroku, and SoundCloud) and unofficial (maintained by an unaffiliated developer, such as Facebook, Google, and Twitter).
+[OmniAuth][omniauth] is a gem for Rails that lets you use multiple authentication providers alongside the more traditional username/password setup. 'Provider' is the most common term for an authentication partner, but within the OmniAuth universe we refer to providers (e.g., using a Facebook account to log in) as _strategies_. The OmniAuth wiki keeps [an up-to-date list of strategies][list_of_strategies], both official (provided directly by the service, such as GitHub, Heroku, and SoundCloud) and unofficial (maintained by an unaffiliated developer, such as Facebook, Google, and Twitter).
 
 Here's how OmniAuth works from the user's standpoint:
-
   1. User tries to access a page on `yoursite.com` that requires them to be logged in. They are redirected to the login screen.
   2. The login screen offers the options of creating an account or logging in with Google or Twitter.
   3. The user clicks `Log in with Google`. This momentarily sends the user to `yoursite.com/auth/google`, which quickly redirects to the Google sign-in page.
   4. If the user is not already signed in to Google, they sign in normally. More likely, they are already signed in, so Google simply asks if it's okay to let `yoursite.com` access the user's information. The user agrees.
   5. They are (hopefully quickly) redirected to `yoursite.com/auth/google/callback` and, from there, to the page they initially tried to access.
 
-Let's see how this works in practice:
+Let's see how this works in practice.
 
 ## OmniAuth with Facebook
-
 The OmniAuth gem allows us to use the OAuth protocol with a number of different providers. All we need to do is add the OmniAuth gem *and* the provider-specific OmniAuth gem (e.g., `omniauth-google`) to our Gemfile. In some cases, adding only the provider-specific gem will suffice because it will install the OmniAuth gem as a dependency, but it's safer to add both — the shortcut is far from universal.
 
 In this case, let's add `omniauth` and `omniauth-facebook` to the Gemfile and then run a `bundle install` command. If we were so inclined, we could add additional OmniAuth gems to our heart's content, offering login via multiple providers in our app.
@@ -76,7 +74,6 @@ Instead of setting environment variables directly in our local `ENV` hash, we're
   4. Add `.env` to your `.gitignore` file to ensure that you don't accidentally commit your precious credentials.
 
 For step three, take the `App ID` and `App Secret` values from the Facebook app dashboard...
-
 ![Facebook App Dashboard](https://user-images.githubusercontent.com/17556281/27404133-f7220c00-569a-11e7-9494-bc3c805b31d0.png)
 
 ...and paste them into the `.env` file as follows:
