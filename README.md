@@ -1,172 +1,200 @@
-# Omniauth
+# OmniAuth
 
 ## Objectives
-  1. Describe the problem of authentication and how Omniauth solves it.
-  2. Explain an Omniauth strategy.
-  3. Describe the problem OAuth solves, and how it solves it.
-  4. Use Omniauth to provide OAuth authentication in a Rails server.
+1. Describe the problem of authentication and how OmniAuth solves it.
+2. Explain an OmniAuth strategy.
+3. Use OmniAuth to handle authentication in a Rails server.
+
+There are no tests for this lesson, but code along as we learn about OmniAuth and build out a login strategy together!
 
 ## Overview
-
 Passwords are terrible.
 
 For one thing, you have to remember them. Or you have to use a password manager, which comes with its own problems. Unsurprisingly, some percentage of users will just leave and never come back the moment you ask them to create an account.
 
-And then on the server, you have to manage all these passwords. You have to store them securely. Rails secures your passwords when they are stored in your database, but it does not secure your servers, which see the password in plain text. If I can get into your servers, I can edit your Rails code and have it send all your users' passwords to me as they submit them. You'll also have to handle password changes, email verification, and password recovery. Inevitably, your users accounts will get broken into. This may or may not be your fault, but when they write to you, it will be your problem.
+And then on the server, you have to manage all these passwords. You have to store them securely. Rails secures your passwords when they are stored in your database, but it does not secure your servers, which see the password in plain text. If I can get into your servers, I can edit your Rails code and have it send all your users' passwords to me as they submit them. You'll also have to handle password changes, email verification, and password recovery. Inevitably, your users accounts will get broken into. This may or may not be your fault, but, when they write to you, it will be your problem.
 
 What if it could be someone else's problem?
 
-Like Google, for example. They are dealing with all these problems somehow (having a huge amount of money helps). For example, when you log into Google, they are looking at vastly more than your username and password. Google considers where you are in the world (they can [guess based on your IP address][ip_geolocation], the operating system you're running (their servers can tell because they [listen very carefully to your computer's accent when it talks to them][IP_stack_fingerprinting]), and numerous other factors. If the login looks suspicious—like you usually log in on a Mac in New York, but today you're logging in on a Windows XP machine in Thailand—they may reject it, or ask you to solve a [captcha][CAPTCHA].
+Like Google, for example. They are dealing with all these problems somehow (having a huge amount of money helps). For example, when you log into Google, they are looking at vastly more than your username and password. Google considers where you are in the world (they can guess based on [your IP address][ip_geolocation]), the operating system you're running (their servers can tell because they [listen very carefully to your computer's accent when it talks to them][ip_fingerprinting]), and numerous other factors. If the login looks suspicious — for instance, you usually log in on a Mac in New York, but today you're logging in on a Windows XP machine in Thailand — they may reject it or ask you to solve a [CAPTCHA][CAPTCHA].
 
-Wouldn't it be nice if your users could use their Google—or Twitter, or Facebook—login for your site?
+Wouldn't it be nice if your users could use their Google — or Twitter, Facebook, GitHub, etc. — login for your site?
 
-Of course, you know this is possible. I'm sure you've seen sites that let you log in with Facebook. Today, we're going to talk about how you can enable such a feature for your site.
+Of course, you know this is possible. It's becoming increasingly rare to find a modern website that _doesn't_ allow users to login via a third-party account. Today, we're going to talk about how to add this feature to your Rails applications.
 
-## Omniauth
+## OmniAuth
+[OmniAuth][omniauth] is a gem for Rails that lets you use multiple authentication providers alongside the more traditional username/password setup. 'Provider' is the most common term for an authentication partner, but within the OmniAuth universe we refer to providers (e.g., using a Facebook account to log in) as _strategies_. The OmniAuth wiki keeps [an up-to-date list of strategies][list_of_strategies], both official (provided directly by the service, such as GitHub, Heroku, and SoundCloud) and unofficial (maintained by an unaffiliated developer, such as Facebook, Google, and Twitter).
 
-[Omniauth][omniauth] is a gem for Rails that lets you use multiple authentication providers on your site. You can let people log in with Twitter, Facebook, Google, or with a username and password.
+Here's how OmniAuth works from the user's standpoint:
+  1. User tries to access a page on `yoursite.com` that requires them to be logged in. They are redirected to the login screen.
+  2. The login screen offers the options of creating an account or logging in with Google or Twitter.
+  3. The user clicks `Log in with Google`. This momentarily sends the user to `yoursite.com/auth/google`, which quickly redirects to the Google sign-in page.
+  4. If the user is not already signed in to Google, they sign in normally. More likely, they are already signed in, so Google simply asks if it's okay to let `yoursite.com` access the user's information. The user agrees.
+  5. They are (hopefully quickly) redirected to `yoursite.com/auth/google/callback` and, from there, to the page they initially tried to access.
 
-Here's how it works from the user's standpoint:
+Let's see how this works in practice.
 
-  1. I try to access a page which requires me to be logged in. I am redirected to the login screen.
-  2. It offers me the options of creating an account, or logging in with Google or Twitter.
-  3. I click "login with Google". This momentarily sends me to `$your_site/auth/google`, which quickly redirects to the Google signin page.
-  4. If I'm not signed in to Google, I sign in. More likely, I am already signed in to Google (because Gmail), so Google asks me if they should let `$your_site` know who I am. I say yes.
-  5. I am (hopefully briefly) redirected to `$your_site/auth/google/callback`, and from there, to the page I wanted.
+## OmniAuth with Facebook
+The OmniAuth gem allows us to use the OAuth protocol with a number of different providers. All we need to do is add the OmniAuth gem *and* the provider-specific OmniAuth gem (e.g., `omniauth-google`) to our Gemfile. In some cases, adding only the provider-specific gem will suffice because it will install the OmniAuth gem as a dependency, but it's safer to add both — the shortcut is far from universal.
 
-Let's see how this works in practice:
+In this case, let's add `omniauth` and `omniauth-facebook` to the Gemfile and then run a `bundle install` command. If we were so inclined, we could add additional OmniAuth gems to our heart's content, offering login via multiple providers in our app.
 
-## Omniauth with Facebook
-
-The Omniauth gem allows us to use the oauth protocol with a number of different providers.  All we need to do is add the gem specific to the provider we want to use in addition to the omniauth gem, in this case
-add `omniauth` and `omniauth-facebook` to your Gemfile and `bundle`.  We can add as many additional omniauth gems if you want multiple provider login in our app. 
-
-First we'll need to tell omniauth about our app's oauth credentials.
-
-Create `config/initializers/omniauth.rb`. It will contain this:
+Next, we'll need to tell OmniAuth about our app's OAuth credentials. Create a file named `config/initializers/omniauth.rb`. It will contain the following lines:
 ```ruby
-    Rails.application.config.middleware.use OmniAuth::Builder do
-      provider :facebook, ENV['FACEBOOK_KEY'], ENV['FACEBOOK_SECRET']
-    end
+Rails.application.config.middleware.use OmniAuth::Builder do
+  provider :facebook, ENV['FACEBOOK_KEY'], ENV['FACEBOOK_SECRET']
+end
 ```
-The ENV constant refers to a global hash for your entire computer environment.  You can store any key value pairs in this environment and so it's a very useful place to store credentials that we don't want to be managed by git and later stored on github (if your repo is public).  The most common error we see from students here is that when ENV["PROVIDER_KEY"] is evaluated in the initializer it returns nil!  Then later when you try and authenticate with the provider you'll get some kind of 4xx error because the provider doesn't recognize your app.
+The code is unfamiliar, but we can guess what's going on from the characteristically clear Rails syntax. We're telling our Rails app to use a piece of middleware created by OmniAuth for the Facebook authentication strategy.
 
-To recieve these credentials, each provider's process is different, but you'll essentially need to register your app with the provider and they'll give you a set of keys specific to your app.
+### `ENV`
+The `ENV` constant refers to a global hash for your entire computer environment. You can store any key-value pairs in this hash, so it's a very useful place to keep credentials that we don't want to be managed by Git or displayed on GitHub (especially if your GitHub repo is public). The most common error students run into is that when `ENV["PROVIDER_KEY"]` is evaluated in the OmniAuth initializer it returns `nil`. Later attempts to authenticate with the provider will cause some kind of `4xx` error because the provider doesn't recognize the app's credentials (because they're evaluating to `nil`).
 
-For Facebook:
-Log in to [the Facebook developer's panel](https://developers.facebook.com). Create an app, copy the key (it's called "App ID" on Facebook's page) and the secret and set them as environment variables in the terminal:
+As you can gather from the initializer code, we're going to need two pieces of information from Facebook in order to get authentication working: the application key and secret that will identify our app to Facebook.
 
-    export FACEBOOK_KEY=<your_key>
-    export FACEBOOK_SECRET=<your_key>
+Log in to [the Facebook developer site](https://developers.facebook.com/). In the `My Apps` dropdown menu at the top-right of the page, select `Add a New App`, and a modal should appear. Fill out the requested information and click `Create App ID`. You should now be on the `Product Setup` page — if you are not, look in the sidebar for `+ Add Product` under the `Products` heading. On the `Product Setup` page, click `Get Started` next to `Facebook Login`:
 
-We've included a [quick video](https://youtu.be/1yryyKB7Edk) as this often trips people up (including experienced folks!).  Make sure you do the last two steps of setting your URL and valid domains. If you don't Facebook will think you're making a request from an invalid site and will never let the user login.
+![Facebook Login](https://user-images.githubusercontent.com/17556281/27402847-25d8c782-5696-11e7-8fa0-2aaa6602de06.png)
 
-Running these commands will make these key value pairs appear in the ENV hash in ruby in that terminal.  A more lasting way to do this is using the Figaro or Dotenv gems.
+Choose the `Web` option, and enter `http://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
 
-Jump into the console to check that you have set the keys properly.  If `ENV["FACEBOOK_KEY"]` and `ENV["FACEBOOK_SECRET"]` return your keys you're all set!
+![Facebook Login Settings](https://user-images.githubusercontent.com/17556281/27403332-0cf83f84-5698-11e7-9e59-acb8ec82a5d2.png)
 
-We now need to create a link that will take the user to Facebook to login.  Create a link anywhere you'd like that sends the user to "/auth/facebook".  We'll need a route, a controller and a view, I'll only show the view.
+In the `Valid OAuth redirect URIs` field, enter `localhost:3000/auth/facebook/callback`, which is the default callback endpoint for the `omniauth-facebook` strategy:
 
-```ruby
-  #\views\static\home.html.erb
-  <%= link_to("login with facebook!", "/auth/facebook") %>
+![Valid OAuth redirect URIs](https://user-images.githubusercontent.com/17556281/27404131-f5aea626-569a-11e7-9f76-df563870d81a.png)
+
+Click `Save Changes`, and then click on `Dashboard` in the sidebar. Keep the page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
+
+### `dotenv-rails`
+Instead of setting environment variables directly in our local `ENV` hash, we're going to let an awesome gem handle the hard work for us. `dotenv-rails` is one of the best ways to ensure that environment variables are correctly loaded into the `ENV` hash in a secure manner. Using it requires four steps:
+  1. Add `dotenv-rails` to your Gemfile and `bundle install`.
+  2. Create a file named `.env` at the root of your application (in this case, inside the `omniauth_readme/` directory).
+  3. Add your Facebook app credentials to the newly created `.env` file
+  4. Add `.env` to your `.gitignore` file to ensure that you don't accidentally commit your precious credentials.
+
+For step three, take the `App ID` and `App Secret` values from the Facebook app dashboard...
+![Facebook App Dashboard](https://user-images.githubusercontent.com/17556281/27404133-f7220c00-569a-11e7-9494-bc3c805b31d0.png)
+
+...and paste them into the `.env` file as follows:
 ```
-**Hot-Tip**
-Log out of Facebook before you do this portion so you can see the full flow.
+FACEBOOK_KEY=247632982388118
+FACEBOOK_SECRET=01ab234567890c123d456ef78babc901
+```
 
-Let's visit this page in the browser and click on the link.
-Clicking on the link clearly sends a GET request to your server to "/auth/facebook", but in the browser we end up at "https://www.facebook.com/login.php?skip_api_login=1&api_key=1688265381390456&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.5%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Dc7e7feeea98f875e7a77d76f7385ea2960db3dc23a397c4b%26scope%3Demail%26response_type%3Dcode%26client_id%3D1688265381390456%26ret%3Dlogin&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Dc7e7feeea98f875e7a77d76f7385ea2960db3dc23a397c4b%23_%3D_&display=page"
+### Routing OAuth flow in your application
+We now need to create a link that will initiate the Facebook OAuth process. The standard OmniAuth path is `/auth/:provider`, so, in this case, we'll need a link to `/auth/facebook`. Let's add one to `app/views/welcome/home.html.erb`:
+```erb
+<%= link_to('Log in with Facebook!', '/auth/facebook') %>
+```
 
-This URL has a whole bunch of parameters all URL [encoded](http://ascii.cl/url-encoding.htm) (which is why they look so strange).  At this point we are at Facebook's site because somewhere in our app omniauth sent the browser a redirect to that url (which it intelligently autogenerated for us!).
+Next, we're going to need a `User` model and a `SessionsController` to track users who log in via Facebook. The `User` model should have four attributes, all strings: `name`, `email`, `image`, and `uid` (the user's ID on Facebook).
 
-Once we're at Facebook and the user logs in, Facebook will send the browser ANOTHER redirect with the URL omniauth told it about in the previous URL.  Omniauth always wants Facebook to redirect us back to our server to the route "/auth/whatever_provider/callback".  Along with that request they'll send a whole bunch of information for us!  
-
-The URL in your browser should looks something like this mess!
-"
-http://localhost:3000/auth/facebook/callback?code=AQA_CrhVYnuufhQid-3vS1NvI5rZfk4uPJwFZIymA90JeUR7NDFFy0bHQjbtneLkymqqZlmFbjcg2A0y5zRmaCy0D7k9H46F3j9pm9slzBIN9fM4Q54zAdiVZo2k6XtiMPZ_AG2xEZ8MyiTtbbQOBdaK57PY7lr7iLuFeaVUCUnZC69ddzcq_tLILEkjagSyWXi8WGGshbnIwy9C6d98hnoxl6AJjIi4TC3FScEAxKQ9vH1tXntQ9YvTLNWlWsWUcbefEq1RlywNi3IqGsLnDgyyRcHph0u4-TpnaqZPxHSNdcWCgnYfHK_bSO-R_a3H4Oo&state=60fb843af784e411ea7b5f809e34dd29d5e4eda891d0c4c1#_=_
-"
-
-You should now see a routing error
-`No route matches [GET] "/auth/facebook/callback"`
-
-Let's add something to handle that redirect
-
+To handle user sessions, we need to create a single route, `sessions#create`, which is where Facebook will redirect users in the callback phase of the login process. Add the following to `config/routes.rb`:
 ```ruby
-#routes.rb
 get '/auth/facebook/callback' => 'sessions#create'
-#note the controller and action you use don't matter, but to be semantic we #should use the sessions controller because we're going to log the user in #by creating a session.
 ```
-Now we create a `SessionsController`. Our goal here is to either create a new user or find the user in our database and log them in.  Facebook sends us a bunch of information back and omniauth parses it for us and puts it in the request environment `request.env['omniauth.auth']`.  We can use the information in here to login the user or create them.
 
-Here's a sample of the auth hash Facebook sends us
+Our `SessionsController` will be pretty simplistic, with a lone action (and a helper method to DRY up our code a bit):
 ```ruby
-{
-  :provider => 'facebook',
-  :uid => '1234567',
-  :info => {
-    :email => 'joe@bloggs.com',
-    :name => 'Joe Bloggs',
-    :first_name => 'Joe',
-    :last_name => 'Bloggs',
-    :image => 'http://graph.facebook.com/1234567/picture?type=square',
-    :urls => { :Facebook => 'http://www.facebook.com/jbloggs' },
-    :location => 'Palo Alto, California',
-    :verified => true
-  },
-  :credentials => {
-    :token => 'ABCDEF...', # OAuth 2.0 access_token, which you may wish to store
-    :expires_at => 1321747205, # when the access token expires (it always will)
-    :expires => true # this will always be true
-  },
-  :extra => {
-    :raw_info => {
-      :id => '1234567',
-      :name => 'Joe Bloggs',
-      :first_name => 'Joe',
-      :last_name => 'Bloggs',
-      :link => 'http://www.facebook.com/jbloggs',
-      :username => 'jbloggs',
-      :location => { :id => '123456789', :name => 'Palo Alto, California' },
-      :gender => 'male',
-      :email => 'joe@bloggs.com',
-      :timezone => -8,
-      :locale => 'en_US',
-      :verified => true,
-      :updated_time => '2011-11-11T06:21:03+0000'
-    }
-  }
-}
-```
-Let's log the user in! (We've omitted the model related code)
-
-```ruby
-#app/controllers/sessions_controller
 class SessionsController < ApplicationController
-
   def create
-    user = User.find_or_create_by(uid => auth['uid']) do |u|
+    @user = User.find_or_create_by(uid: auth['uid']) do |u|
       u.name = auth['info']['name']
       u.email = auth['info']['email']
+      u.image = auth['info']['image']
     end
-    session[:user_id] = user.id
+
+    session[:user_id] = @user.id
+
+    render 'welcome/home'
   end
+
+  private
 
   def auth
     request.env['omniauth.auth']
   end
-
 end
 ```
 
-That completes the whole oauth login flow!
+And, finally, since we're re-rendering the `welcome#home` view upon logging in via Facebook, let's add a control flow to display user data if the user is logged in and the login link otherwise:
+```erb
+<% if session[:user_id] %>
+  <h1><%= @user.name %></h1>
+  <h2>Email: <%= @user.email %></h2>
+  <h2>Facebook UID: <%= @user.uid %></h2>
+  <img src="<%= @user.image %>">
+<% else %>
+  <%= link_to('Log in with Facebook!', '/auth/facebook') %>
+<% end %>
+```
 
-##Conclusion
+Now it's time to test it out! It's best to log out of Facebook prior to clicking the login link — that way, you'll see the full login flow.
 
-Implementing the oauth protocol yourself is extremely complicated.  Using the omniauth gem along with the omniauth-provider gem for the provider you'd like to allow users to log in to your site with makes the process a lot easier, but it still trips a lot of people up!  Make sure you understand each piece of the flow, what you expect to happen, and any deviance from the expected result.  The end result should be getting access to the users data from the provider in your sessions controller where you can decide what to do with it, which is usually either creating a user in your database using their provider data, and/or logging them in.
+#### A man, a plan, a param, Panama
+Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI: `https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`. The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
+
+Right away, we see our Facebook application key, `api_key=247632982388118`, and the Facebook API endpoint that the login flow will send us to next: `next=https://www.facebook.com/v2.9/dialog/oauth`. At that point, there are divergent paths, one for successful login:
+  + `redirect_uri=http://localhost:3000/auth/facebook/callback` — If login succeeds, we'll be redirected to our server's OmniAuth callback route.
+  + `scope=email` — This tells Facebook that we want to receive the user's registered email address in the login response. We didn't have to configure anything (`scope=email` is the default), but if you want to request other specific pieces of user data check out [the `omniauth-facebook` documentation](https://github.com/mkdynamic/omniauth-facebook#configuring).
+  + `client_id=247632982388118` — There's our application key again, this time provided to the success callback.
+And one for failure:
+  + `cancel_url=http://localhost:3000/auth/facebook/callback` — If login fails, we'll also be redirected to our server's OmniAuth callback route. However, this time there are some nested encoded parameters that provide information about the failure:
+    * `error=access_denied`
+    * `error_code=200`
+    * `error_description=Permissions error`
+    * `error_reason=user_denied`
+
+#### Inspecting the returned authentication data
+If you want to inspect the exact information that Facebook returns to our application about a logged-in user, throw a `binding.pry` in the `SessionsController#create` method and call `auth` inside the Pry session:
+```bash
+     2: def create
+     3:   @user = User.find_or_create_by(uid: auth['uid']) do |u|
+     4:     u.name = auth['info']['name']
+     5:     u.email = auth['info']['email']
+     6:     u.image = auth['info']['image']
+     7:   end
+     8:
+ =>  9:   binding.pry
+    10:
+    11:   session[:user_id] = @user.id
+    12:
+    13:   render 'welcome/home'
+    14: end
+
+[1] pry(#<SessionsController>)> auth
+=> {"provider"=>"facebook",
+ "uid"=>"123456789012345",
+ "info"=>
+  {"email"=>"mary@poppins.com",
+   "name"=>"Mary Poppins",
+   "image"=>"http://graph.facebook.com/v2.6/123456789012345/picture"},
+ "credentials"=>
+  {"token"=>
+    "ABCDaEFbcGHIJKLMNdlOPeQRfSTUVWgXf1hYiZAjBkClDEmFG234n5oH6p7IJqKr0stLMNuOPQRv86S47TUVWX1YZwABCDxyz2EabcdFGeH4IfgJK9hLi0jM1kNOPQlRmn1oSTUp5qr7VWstuXvYZwxAByza807CbD9c3defEFGghijkHIJK",
+   "expires_at"=>1503263133,
+   "expires"=>true},
+ "extra"=>
+  {"raw_info"=>
+    {"name"=>"Mary Poppins",
+     "email"=>"mary@poppins.com",
+     "id"=>"123456789012345"}}}
+```
+
+When you make a server-side API call (as we did), Facebook will provide an access token that's good for about two months, so you don't have to bug your users very often. That's good!
+
+## Conclusion
+Implementing the OAuth protocol yourself is extremely complicated. Using the OmniAuth gem along with any `omniauth-provider` gem(s) streamlines the process, allowing users to log in to your site easily. However, it still trips a lot of people up! Make sure you understand each piece of the flow, what you expect to happen, and any deviation from the expected result. The end result should be gaining access to the user's data from the provider in your `SessionsController`, where you can then decide what to do with it. Typically, if a matching `User` exists in your database, the client will be logged in to your application. If no match is found, a new `User` will be created using the data received from the provider.
+
+## Resources
+* [Managing Environment Variables](https://launchschool.com/blog/managing-environment-configuration-variables-in-rails)
 
 [ip_geolocation]: https://en.wikipedia.org/wiki/Geolocation
 [ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
 [CAPTCHA]: https://en.wikipedia.org/wiki/CAPTCHA
 [yak]: https://en.wiktionary.org/wiki/yak_shaving
 [omniauth]: https://github.com/intridea/omniauth
-<p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme'>Omniauth </a> on Learn.co and start learning to code for free.</p>
+[list_of_strategies]: https://github.com/omniauth/omniauth/wiki/List-of-Strategies
+
+<p data-visibility='hidden'>View <a href='https://learn.co/lessons/omniauth_readme' title='OmniAuth'>OmniAuth</a> on Learn.co and start learning to code for free.</p>
