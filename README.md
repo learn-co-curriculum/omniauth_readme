@@ -7,6 +7,8 @@
 
 There are no tests for this lesson, but code along as we learn about OmniAuth and build out a login strategy together!
 
+***NOTE***: If you run into trouble with Facebook, use the usual avenues for assistance (Google, StackOverflow, AAQ, Slack, and so on), but don't bash your head against the wall too much. Facebook is the choice for this lesson because it is ubiquitous as an OAuth provider, but feel free to pick a different provider (GitHub, for instance). A bit of struggle in the setup process is healthy — that's a learning opportunity. However, the ultimate point of this lesson is to learn how to use OmniAuth; not to waste six hours fighting with the Facebook developer interface.
+
 ## Overview
 Passwords are terrible.
 
