@@ -58,13 +58,15 @@ Log in to [the Facebook developer site](https://developers.facebook.com/). In th
 
 ![Facebook Login](https://user-images.githubusercontent.com/17556281/27402847-25d8c782-5696-11e7-8fa0-2aaa6602de06.png)
 
-Choose the `Web` option, and enter `https://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
+Choose the `Web` option, and enter `http://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
 
 ![Facebook Login Settings](https://user-images.githubusercontent.com/17556281/27403332-0cf83f84-5698-11e7-9e59-acb8ec82a5d2.png)
 
 In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/facebook/callback`, which is the default callback endpoint for the `omniauth-facebook` strategy:
 
 ![Valid OAuth redirect URIs](https://user-images.githubusercontent.com/17556281/27404131-f5aea626-569a-11e7-9f76-df563870d81a.png)
+
+(Note: as of March 2018, Facebook requires `https` uris for redirects. Make sure to prepend your `Valid OAuth Redirect URIs` with `https`.)
 
 Click `Save Changes`, and then click on `Dashboard` in the sidebar. Keep the page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
 
@@ -133,6 +135,10 @@ And, finally, since we're re-rendering the `welcome#home` view upon logging in v
 ```
 
 Now it's time to test it out! It's best to log out of Facebook prior to clicking the login link — that way, you'll see the full login flow.
+
+In order to ensure Rails is using https, do the following to start the server instead of our normal `rails s` flow:
+
+`thin start --ssl`
 
 #### A man, a plan, a param, Panama
 Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI: `https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`. The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
