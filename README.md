@@ -58,11 +58,11 @@ Log in to [the Facebook developer site](https://developers.facebook.com/). In th
 
 ![Facebook Login](https://user-images.githubusercontent.com/17556281/27402847-25d8c782-5696-11e7-8fa0-2aaa6602de06.png)
 
-Choose the `Web` option, and enter `http://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
+Choose the `Web` option, and enter `https://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
 
 ![Facebook Login Settings](https://user-images.githubusercontent.com/17556281/27403332-0cf83f84-5698-11e7-9e59-acb8ec82a5d2.png)
 
-In the `Valid OAuth redirect URIs` field, enter `localhost:3000/auth/facebook/callback`, which is the default callback endpoint for the `omniauth-facebook` strategy:
+In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/facebook/callback`, which is the default callback endpoint for the `omniauth-facebook` strategy:
 
 ![Valid OAuth redirect URIs](https://user-images.githubusercontent.com/17556281/27404131-f5aea626-569a-11e7-9f76-df563870d81a.png)
 
@@ -138,11 +138,11 @@ Now it's time to test it out! It's best to log out of Facebook prior to clicking
 Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI: `https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`. The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
 
 Right away, we see our Facebook application key, `api_key=247632982388118`, and the Facebook API endpoint that the login flow will send us to next: `next=https://www.facebook.com/v2.9/dialog/oauth`. At that point, there are divergent paths, one for successful login:
-  + `redirect_uri=http://localhost:3000/auth/facebook/callback` — If login succeeds, we'll be redirected to our server's OmniAuth callback route.
+  + `redirect_uri=https://localhost:3000/auth/facebook/callback` — If login succeeds, we'll be redirected to our server's OmniAuth callback route.
   + `scope=email` — This tells Facebook that we want to receive the user's registered email address in the login response. We didn't have to configure anything (`scope=email` is the default), but if you want to request other specific pieces of user data check out [the `omniauth-facebook` documentation](https://github.com/mkdynamic/omniauth-facebook#configuring).
   + `client_id=247632982388118` — There's our application key again, this time provided to the success callback.
 And one for failure:
-  + `cancel_url=http://localhost:3000/auth/facebook/callback` — If login fails, we'll also be redirected to our server's OmniAuth callback route. However, this time there are some nested encoded parameters that provide information about the failure:
+  + `cancel_url=https://localhost:3000/auth/facebook/callback` — If login fails, we'll also be redirected to our server's OmniAuth callback route. However, this time there are some nested encoded parameters that provide information about the failure:
     * `error=access_denied`
     * `error_code=200`
     * `error_description=Permissions error`
