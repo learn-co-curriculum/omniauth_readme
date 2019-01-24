@@ -56,22 +56,32 @@ As you can gather from the initializer code, we're going to need two pieces of i
 
 Log in to [the Facebook developer site](https://developers.facebook.com/). In the `My Apps` dropdown menu at the top-right of the page, select `Add a New App`, and a modal should appear. Fill out the requested information and click `Create App ID`. You should now be on the `Product Setup` page — if you are not, look in the sidebar for `+ Add Product` under the `Products` heading. On the `Product Setup` page, click `Get Started` next to `Facebook Login`:
 
-![Facebook Login](https://user-images.githubusercontent.com/17556281/27402847-25d8c782-5696-11e7-8fa0-2aaa6602de06.png)
+![fboauth-1-1](https://user-images.githubusercontent.com/16994388/51709335-bec70380-1feb-11e9-901d-1d597fcc0c7a.png)
+
+![fboauth-1-2](https://user-images.githubusercontent.com/16994388/51709336-bec70380-1feb-11e9-9ac2-5bfd88a7c761.png)
 
 Choose the `Web` option, and enter `https://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
 
+![fboauth-2-1](https://user-images.githubusercontent.com/16994388/51709337-bf5f9a00-1feb-11e9-80a2-943591ed7975.png)
+
+![fboauth-2-2](https://user-images.githubusercontent.com/16994388/51709338-bf5f9a00-1feb-11e9-9ab4-714fb4e91303.png)
+
+
 (NOTE: The urls in the two images below should be prefixed with `https://`)
 
-![Facebook Login Settings](https://user-images.githubusercontent.com/17556281/27403332-0cf83f84-5698-11e7-9e59-acb8ec82a5d2.png)
+![fboauth-03](https://user-images.githubusercontent.com/16994388/51709339-bf5f9a00-1feb-11e9-95f6-897ae70485fe.png)
+
+![fboauth-04](https://user-images.githubusercontent.com/16994388/51709340-bf5f9a00-1feb-11e9-9c4b-f0b32e0beacd.png)
 
 
 In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/facebook/callback`, which is the default callback endpoint for the `omniauth-facebook` strategy:
 
-![Valid OAuth redirect URIs](https://user-images.githubusercontent.com/17556281/27404131-f5aea626-569a-11e7-9f76-df563870d81a.png)
+![fboauth-06](https://user-images.githubusercontent.com/16994388/51709341-bf5f9a00-1feb-11e9-8740-d788c60b00d5.png)
 
 (Note: as of March 2018, Facebook requires `https` uris for redirects. Make sure to prepend your `Valid OAuth Redirect URIs` with `https`.)
 
 Click `Save Changes`, and then click on `Dashboard` in the sidebar. Keep the page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
+
 
 ### `dotenv-rails`
 Instead of setting environment variables directly in our local `ENV` hash, we're going to let an awesome gem handle the hard work for us. `dotenv-rails` is one of the best ways to ensure that environment variables are correctly loaded into the `ENV` hash in a secure manner. Using it requires four steps:
@@ -81,7 +91,8 @@ Instead of setting environment variables directly in our local `ENV` hash, we're
   4. Add `.env` to your `.gitignore` file to ensure that you don't accidentally commit your precious credentials.
 
 For step three, take the `App ID` and `App Secret` values from the Facebook app dashboard...
-![Facebook App Dashboard](https://user-images.githubusercontent.com/17556281/27404133-f7220c00-569a-11e7-9494-bc3c805b31d0.png)
+![fboauth-11](https://user-images.githubusercontent.com/16994388/51709789-fa160200-1fec-11e9-91d2-21bb7f2f9c75.png)
+
 
 ...and paste them into the `.env` file as follows:
 ```
@@ -139,15 +150,26 @@ And, finally, since we're re-rendering the `welcome#home` view upon logging in v
 
 Now it's time to test it out! It's best to log out of Facebook prior to clicking the login link — that way, you'll see the full login flow.
 
+![fboauth-07](https://user-images.githubusercontent.com/16994388/51709342-bf5f9a00-1feb-11e9-9826-b0d3f8991958.png)
+
 In order to ensure Rails is using https, do the following to start the server instead of our normal `rails s` flow:
 
 `thin start --ssl`
 
+![fboauth-08](https://user-images.githubusercontent.com/16994388/51709344-bf5f9a00-1feb-11e9-986c-31df9076d768.png)
+
 #### A man, a plan, a param, Panama
 Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI: `https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`. The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
 
+![fboauth-09](https://user-images.githubusercontent.com/16994388/51709345-bff83080-1feb-11e9-9ead-8dafd5158d84.png)
+
+![fboauth-10](https://user-images.githubusercontent.com/16994388/51709346-bff83080-1feb-11e9-9287-264e18eea6bc.png)
+
 Right away, we see our Facebook application key, `api_key=247632982388118`, and the Facebook API endpoint that the login flow will send us to next: `next=https://www.facebook.com/v2.9/dialog/oauth`. At that point, there are divergent paths, one for successful login:
   + `redirect_uri=https://localhost:3000/auth/facebook/callback` — If login succeeds, we'll be redirected to our server's OmniAuth callback route.
+  
+![fboauth-12](https://user-images.githubusercontent.com/16994388/51709347-bff83080-1feb-11e9-8918-ecefe18847b1.png)
+  
   + `scope=email` — This tells Facebook that we want to receive the user's registered email address in the login response. We didn't have to configure anything (`scope=email` is the default), but if you want to request other specific pieces of user data check out [the `omniauth-facebook` documentation](https://github.com/mkdynamic/omniauth-facebook#configuring).
   + `client_id=247632982388118` — There's our application key again, this time provided to the success callback.
 And one for failure:
