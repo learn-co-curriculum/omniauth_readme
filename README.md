@@ -54,7 +54,7 @@ The `ENV` constant refers to a global hash for your entire computer environment.
 
 As you can gather from the initializer code, we're going to need two pieces of information from Facebook in order to get authentication working: the application key and secret that will identify our app to Facebook.
 
-Log in to [the Facebook developer site](https://developers.facebook.com/). In the `My Apps` dropdown menu at the top-right of the page, select `Add a New App`, and a modal should appear. Fill out the requested information and click `Create App ID`. You should now be on the `Product Setup` page — if you are not, look in the sidebar for `+ Add Product` under the `Products` heading. On the `Product Setup` page, click `Get Started` next to `Facebook Login`:
+Log in to [the Facebook developer site](https://developers.facebook.com/). In the `My Apps` dropdown menu at the top-right of the page, select `Create App`, and a modal should appear. Fill out the requested information and click `Create App ID`. Click `Skip` at the bottom of the `Select a Scenario` page. You should now be on the Dashboard. Scroll down to the `Add a Product` section and click `Setup` on the `Facebook Login` tile:
 
 ![Facebook Login](https://user-images.githubusercontent.com/17556281/27402847-25d8c782-5696-11e7-8fa0-2aaa6602de06.png)
 
@@ -71,7 +71,7 @@ In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/fac
 
 (Note: as of March 2018, Facebook requires `https` uris for redirects. Make sure to prepend your `Valid OAuth Redirect URIs` with `https`.)
 
-Click `Save Changes`, and then click on `Dashboard` in the sidebar. Keep the page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
+Click `Save Changes`, and then click on `Dashboard` in the sidebar. Click on `Settings` and then `Basic`. Keep the page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
 
 ### `dotenv-rails`
 Instead of setting environment variables directly in our local `ENV` hash, we're going to let an awesome gem handle the hard work for us. `dotenv-rails` is one of the best ways to ensure that environment variables are correctly loaded into the `ENV` hash in a secure manner. Using it requires four steps:
