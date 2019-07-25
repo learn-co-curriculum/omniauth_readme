@@ -54,7 +54,7 @@ The `ENV` constant refers to a global hash for your entire computer environment.
 
 As you can gather from the initializer code, we're going to need two pieces of information from Facebook in order to get authentication working: the application key and secret that will identify our app to Facebook.
 
-Log in to [the Facebook developer site](https://developers.facebook.com/){target='blank'}. In the `My Apps` dropdown menu at the top-right of the page, select `Create App`, and a modal should appear. Fill out the requested information and click `Create App ID`. Click `Skip` at the bottom of the `Select a Scenario` page. You should now be on the Dashboard. Scroll down to the `Add a Product` section and click `Set Up` on the `Facebook Login` tile:
+Log in to [the Facebook developer site](https://developers.facebook.com/). In the `My Apps` dropdown menu at the top-right of the page, select `Create App`, and a modal should appear. Fill out the requested information and click `Create App ID`. Click `Skip` at the bottom of the `Select a Scenario` page. You should now be on the Dashboard. Scroll down to the `Add a Product` section and click `Set Up` on the `Facebook Login` tile:
 
 ![Facebook Login](https://user-images.githubusercontent.com/9666939/61841071-aaf04300-ae50-11e9-8a04-e58a03e9e866.png)
 
