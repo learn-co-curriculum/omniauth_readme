@@ -218,6 +218,3 @@ Implementing the OAuth protocol yourself is extremely complicated. Using the Omn
 [yak]: https://en.wiktionary.org/wiki/yak_shaving
 [omniauth]: https://github.com/intridea/omniauth
 [list_of_strategies]: https://github.com/omniauth/omniauth/wiki/List-of-Strategies
-
-
-<p class='util--hide'>View <a href='https://learn.co/lessons/omniauth_readme' title='OmniAuth'>OmniAuth</a> on Learn.co and start learning to code for free.</p>
