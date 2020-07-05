@@ -218,3 +218,4 @@ Implementing the OAuth protocol yourself is extremely complicated. Using the Omn
 [yak]: https://en.wiktionary.org/wiki/yak_shaving
 [omniauth]: https://github.com/intridea/omniauth
 [list_of_strategies]: https://github.com/omniauth/omniauth/wiki/List-of-Strategies
+
