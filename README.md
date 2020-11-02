@@ -41,6 +41,12 @@ The OmniAuth gem allows us to use the OAuth protocol with a number of different 
 
 In this case, let's add `omniauth` and `omniauth-facebook` to the Gemfile and then run a `bundle install` command. If we were so inclined, we could add additional OmniAuth gems to our heart's content, offering login via multiple providers in our app.
 
+***Note:*** If running `bundle install` gives you an error with installing `thin`, run the following:
+
+```sh
+gem install thin -- --with-cflags="-Wno-error=implicit-function-declaration"
+```
+
 Next, we'll need to tell OmniAuth about our app's OAuth credentials. Create a file named `config/initializers/omniauth.rb`. It will contain the following lines:
 ```ruby
 Rails.application.config.middleware.use OmniAuth::Builder do
