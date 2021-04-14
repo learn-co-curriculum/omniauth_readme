@@ -45,6 +45,8 @@ The OmniAuth gem allows us to use the OAuth protocol with a number of different 
 
 In this case, let's add `omniauth` and `omniauth-facebook` to the Gemfile and then run a `bundle install` command. If we were so inclined, we could add additional OmniAuth gems to our heart's content, offering login via multiple providers in our app.
 
+Due to changes to the `omniauth` gem we need to add one more additional gem to our `Gemfile`: `omniauth-rails_csrf_protection`.
+
 ***Note:*** If running `bundle install` gives you an error with installing `thin`, run the following:
 
 ```sh
@@ -106,7 +108,7 @@ FACEBOOK_SECRET=01ab234567890c123d456ef78babc901
 We now need to create a link that will initiate the Facebook OAuth process. The standard OmniAuth path is `/auth/:provider`, so, in this case, we'll need a link to `/auth/facebook`. Let's add one to `app/views/welcome/home.html.erb`:
 
 ```erb
-<%= link_to('Log in with Facebook!', '/auth/facebook') %>
+<%= link_to('Log in with Facebook!', '/auth/facebook', method: :post) %>
 ```
 
 Next, we're going to need a `User` model and a `SessionsController` to track users who log in via Facebook. The `User` model should have four attributes, all strings: `name`, `email`, `image`, and `uid` (the user's ID on Facebook).
@@ -150,7 +152,7 @@ And, finally, since we're re-rendering the `welcome#home` view upon logging in v
   <h2>Facebook UID: <%= @user.uid %></h2>
   <img src="<%= @user.image %>">
 <% else %>
-  <%= link_to('Log in with Facebook!', '/auth/facebook') %>
+  <%= link_to('Log in with Facebook!', '/auth/facebook', method: :post) %>
 <% end %>
 ```
 
