@@ -194,6 +194,7 @@ And one for failure:
 #### Inspecting the returned authentication data
 
 If you want to inspect the exact information that Facebook returns to our application about a logged-in user, throw a `binding.pry` in the `SessionsController#create` method and call `auth` inside the Pry session:
+
 ```bash
      2: def create
      3:   @user = User.find_or_create_by(uid: auth['uid']) do |u|
