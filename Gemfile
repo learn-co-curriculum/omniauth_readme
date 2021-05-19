@@ -1,5 +1,10 @@
 source 'https://rubygems.org'
 
+gem 'omniauth'
+gem 'omniauth-facebook'
+gem 'dotenv-rails'
+gem 'omniauth-rails_csrf_protection'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.0'
 # Use sqlite3 as the database for Active Record
