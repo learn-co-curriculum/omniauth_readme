@@ -233,9 +233,6 @@ When you make a server-side API call (as we did), Facebook will provide an acces
 
 Implementing the OAuth protocol yourself is extremely complicated. Using the OmniAuth gem along with any `omniauth-provider` gem(s) streamlines the process, allowing users to log in to your site easily. However, it still trips a lot of people up! Make sure you understand each piece of the flow, what you expect to happen, and any deviation from the expected result. The end result should be gaining access to the user's data from the provider in your `SessionsController`, where you can then decide what to do with it. Typically, if a matching `User` exists in your database, the client will be logged in to your application. If no match is found, a new `User` will be created using the data received from the provider.
 
-## Resources
-
-* [Managing Environment Variables](https://launchschool.com/blog/managing-environment-configuration-variables-in-rails)
 
 [ip_geolocation]: https://en.wikipedia.org/wiki/Geolocation
 [ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
