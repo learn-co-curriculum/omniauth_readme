@@ -98,8 +98,8 @@ Instead of setting environment variables directly in our local `ENV` hash, we're
   3. Add your Facebook app credentials to the newly created `.env` file
   4. Add `.env` to your `.gitignore` file to ensure that you don't accidentally commit your precious credentials.
 
-For step three, take the `App ID` and `App Secret` values from the Facebook app dashboard...
-![Facebook App Dashboard](https://user-images.githubusercontent.com/17556281/27404133-f7220c00-569a-11e7-9494-bc3c805b31d0.png)
+For step three, take the `App ID` and `App Secret` values from the Facebook basic settings page you opened earlier...
+![Facebook App Dashboard](https://curriculum-content.s3.amazonaws.com/omniauth-readme/app_id_and_secret.png)
 
 ...and paste them into the `.env` file as follows:
 
