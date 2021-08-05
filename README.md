@@ -67,13 +67,20 @@ The `ENV` constant refers to a global hash for your entire computer environment.
 
 As you can gather from the initializer code, we're going to need two pieces of information from Facebook in order to get authentication working: the application key and secret that will identify our app to Facebook.
 
-Log in to [the Facebook developer site](https://developers.facebook.com/). In the `My Apps` dropdown menu at the top-right of the page, select `Create App`, and a modal should appear. Fill out the requested information and click `Create App ID`. Click `Skip` at the bottom of the `Select a Scenario` page. You should now be on the Dashboard. Scroll down to the `Add a Product` section and click `Set Up` on the `Facebook Login` tile:
+Log in to [the Facebook developer site](https://developers.facebook.com/). Click
+on `My Apps` at the top right of the page, then click `Create App`. In the modal
+that appears, select `Consumer` and click `Continue`. 
 
-![Facebook Login](https://user-images.githubusercontent.com/9666939/61841071-aaf04300-ae50-11e9-8a04-e58a03e9e866.png)
+![Select App Type](https://curriculum-content.s3.amazonaws.com/omniauth-readme/select_app_type.png)
+
+Give your app a display name and click `Create App`. In the dashboard that
+appears, click `Set Up` on the `Facebook Login` tile:
+
+![Facebook Login](https://curriculum-content.s3.amazonaws.com/omniauth-readme/app_create_dashboard.png)
 
 Choose the `Web` option, and enter `https://localhost:3000/` when it prompts you for your `Site URL`. Click `Save`, and then click on `Settings` under the `Facebook Login` heading in the sidebar:
 
-![Facebook Login Settings](https://user-images.githubusercontent.com/9666939/61841390-cdcf2700-ae51-11e9-8fe3-07fc581edf7b.png)
+![Facebook Login Settings](https://curriculum-content.s3.amazonaws.com/omniauth-readme/facebook_login_settings.png)
 
 In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/facebook/callback`, which is the default callback endpoint for the `omniauth-facebook` strategy:
 
@@ -81,7 +88,7 @@ In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/fac
 
 (Note: as of March 2018, Facebook requires `https` URIs for redirects. Make sure to prepend your `Valid OAuth Redirect URIs` with `https`.)
 
-Click `Save Changes`, and then click on `Dashboard` in the sidebar. Click on `Settings` and then `Basic`. Keep the page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
+Click `Save Changes`, expand the `Settings` cog at the top of the sidebar and click `Basic`. Keep this page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
 
 ### `dotenv-rails`
 
@@ -161,6 +168,8 @@ Now it's time to test it out! It's best to log out of Facebook prior to clicking
 In order to ensure Rails is using https, do the following to start the server instead of our normal `rails s` flow:
 
 `thin start --ssl`
+
+Then navigate to [https://localhost:3000](https://localhost:3000).
 
 ![fboauth-08](https://user-images.githubusercontent.com/16994388/51709344-bf5f9a00-1feb-11e9-986c-31df9076d768.png)
 
