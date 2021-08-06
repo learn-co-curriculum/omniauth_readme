@@ -163,8 +163,6 @@ And, finally, since we're re-rendering the `welcome#home` view upon logging in v
 
 Now it's time to test it out! It's best to log out of Facebook prior to clicking the login link — that way, you'll see the full login flow.
 
-![fboauth-07](https://user-images.githubusercontent.com/16994388/51709342-bf5f9a00-1feb-11e9-9826-b0d3f8991958.png)
-
 In order to ensure Rails is using https, do the following to start the server instead of our normal `rails s` flow:
 
 `thin start --ssl`
@@ -173,26 +171,34 @@ Then navigate to [https://localhost:3000](https://localhost:3000).
 
 ![fboauth-08](https://user-images.githubusercontent.com/16994388/51709344-bf5f9a00-1feb-11e9-986c-31df9076d768.png)
 
+When you click the link, you should be prompted log in to Facebook and then to give access to your Facebook account to the app.
+
+![fboauth-09](https://user-images.githubusercontent.com/16994388/51709345-bff83080-1feb-11e9-9ead-8dafd5158d84.png)
+
+![fboauth-10](https://user-images.githubusercontent.com/16994388/51709346-bff83080-1feb-11e9-9287-264e18eea6bc.png)
+
+If everything is working correctly, you should then see your Facebook information displayed in the browser:
+
+  ![fboauth-12](https://user-images.githubusercontent.com/16994388/51709347-bff83080-1feb-11e9-8918-ecefe18847b1.png)
+
 **Note:** In the `application.rb` file, there is a line with `config.force_ssl = true`, which _forces all access to the app over SSL, uses Strict-Transport-Security, and uses secure cookies_. This line has been commented out so that the lab may work properly, and not cause students to get hung up on debugging and having issues with other labs. Chrome would cache the HTTPS protocol for the localhost domain, and only clearing the cache would work. However, in practice, it is still recommended to use `ssl` in OmniAuth applications.
 
 #### A man, a plan, a param, Panama
 
 Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI: `https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`. The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
 
-![fboauth-09](https://user-images.githubusercontent.com/16994388/51709345-bff83080-1feb-11e9-9ead-8dafd5158d84.png)
-
-![fboauth-10](https://user-images.githubusercontent.com/16994388/51709346-bff83080-1feb-11e9-9287-264e18eea6bc.png)
-
 Right away, we see our Facebook application key, `api_key=247632982388118`, and the Facebook API endpoint that the login flow will send us to next: `next=https://www.facebook.com/v2.9/dialog/oauth`. At that point, there are divergent paths, one for successful login:
+
   + `redirect_uri=https://localhost:3000/auth/facebook/callback` — If login succeeds, we'll be redirected to our server's OmniAuth callback route.
 
-  ![fboauth-12](https://user-images.githubusercontent.com/16994388/51709347-bff83080-1feb-11e9-8918-ecefe18847b1.png)
-
   + `scope=email` — This tells Facebook that we want to receive the user's registered email address in the login response. We didn't have to configure anything (`scope=email` is the default), but if you want to request other specific pieces of user data check out [the `omniauth-facebook` documentation](https://github.com/mkdynamic/omniauth-facebook#configuring).
+
   + `client_id=247632982388118` — There's our application key again, this time provided to the success callback.
   
 And one for failure:
+
   + `cancel_url=https://localhost:3000/auth/facebook/callback` — If login fails, we'll also be redirected to our server's OmniAuth callback route. However, this time there are some nested encoded parameters that provide information about the failure:
+
     * `error=access_denied`
     * `error_code=200`
     * `error_description=Permissions error`
@@ -242,11 +248,8 @@ When you make a server-side API call (as we did), Facebook will provide an acces
 
 Implementing the OAuth protocol yourself is extremely complicated. Using the OmniAuth gem along with any `omniauth-provider` gem(s) streamlines the process, allowing users to log in to your site easily. However, it still trips a lot of people up! Make sure you understand each piece of the flow, what you expect to happen, and any deviation from the expected result. The end result should be gaining access to the user's data from the provider in your `SessionsController`, where you can then decide what to do with it. Typically, if a matching `User` exists in your database, the client will be logged in to your application. If no match is found, a new `User` will be created using the data received from the provider.
 
-
 [ip_geolocation]: https://en.wikipedia.org/wiki/Geolocation
 [ip_fingerprinting]: https://en.wikipedia.org/wiki/TCP/IP_stack_fingerprinting
 [CAPTCHA]: https://en.wikipedia.org/wiki/CAPTCHA
-[yak]: https://en.wiktionary.org/wiki/yak_shaving
 [omniauth]: https://github.com/intridea/omniauth
 [list_of_strategies]: https://github.com/omniauth/omniauth/wiki/List-of-Strategies
-
