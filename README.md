@@ -31,6 +31,7 @@ Of course, you know this is possible. It's becoming increasingly rare to find a 
 [OmniAuth][omniauth] is a gem for Rails that lets you use multiple authentication providers alongside the more traditional username/password setup. 'Provider' is the most common term for an authentication partner, but within the OmniAuth universe we refer to providers (e.g., using a Facebook account to log in) as _strategies_. The OmniAuth wiki keeps [an up-to-date list of strategies][list_of_strategies], both official (provided directly by the service, such as GitHub, Heroku, and SoundCloud) and unofficial (maintained by an unaffiliated developer, such as Facebook, Google, and Twitter).
 
 Here's how OmniAuth works from the user's standpoint:
+
   1. User tries to access a page on `yoursite.com` that requires them to be logged in. They are redirected to the login screen.
   2. The login screen offers the options of creating an account or logging in with Google or Twitter.
   3. The user clicks `Log in with Google`. This momentarily sends the user to `yoursite.com/auth/google`, which quickly redirects to the Google sign-in page.
@@ -93,6 +94,7 @@ Click `Save Changes`, expand the `Settings` cog at the top of the sidebar and cl
 ### `dotenv-rails`
 
 Instead of setting environment variables directly in our local `ENV` hash, we're going to let an awesome gem handle the hard work for us. `dotenv-rails` is one of the best ways to ensure that environment variables are correctly loaded into the `ENV` hash in a secure manner. Using it requires four steps:
+
   1. Add `dotenv-rails` to your Gemfile and `bundle install`.
   2. Create a file named `.env` at the root of your application (in this case, inside the `omniauth_readme/` directory).
   3. Add your Facebook app credentials to the newly created `.env` file
@@ -103,7 +105,7 @@ For step three, take the `App ID` and `App Secret` values from the Facebook basi
 
 ...and paste them into the `.env` file as follows:
 
-```
+```ruby
 FACEBOOK_KEY=247632982388118
 FACEBOOK_SECRET=01ab234567890c123d456ef78babc901
 ```
@@ -171,7 +173,7 @@ Then navigate to [https://localhost:3000](https://localhost:3000).
 
 ![fboauth-08](https://user-images.githubusercontent.com/16994388/51709344-bf5f9a00-1feb-11e9-986c-31df9076d768.png)
 
-When you click the link, you should be prompted log in to Facebook and then to give access to your Facebook account to the app.
+When you click the link, you should be prompted log in to Facebook and then to give the app access to your Facebook account.
 
 ![fboauth-09](https://user-images.githubusercontent.com/16994388/51709345-bff83080-1feb-11e9-9ead-8dafd5158d84.png)
 
@@ -185,7 +187,13 @@ If everything is working correctly, you should then see your Facebook informatio
 
 #### A man, a plan, a param, Panama
 
-Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI: `https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`. The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
+Upon clicking the link, your browser sends a `GET` request to the `/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook login screen with a ridiculously long URI:
+
+ ```
+ https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`
+ ```
+
+ The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but we can parse through them to get an idea of what's actually being communicated.
 
 Right away, we see our Facebook application key, `api_key=247632982388118`, and the Facebook API endpoint that the login flow will send us to next: `next=https://www.facebook.com/v2.9/dialog/oauth`. At that point, there are divergent paths, one for successful login:
 
