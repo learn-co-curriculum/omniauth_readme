@@ -89,7 +89,11 @@ In the `Valid OAuth redirect URIs` field, enter `https://localhost:3000/auth/fac
 
 (Note: as of March 2018, Facebook requires `https` URIs for redirects. Make sure to prepend your `Valid OAuth Redirect URIs` with `https`.)
 
-Click `Save Changes`, expand the `Settings` cog at the top of the sidebar and click `Basic`. Keep this page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
+Click `Save Changes`, then expand the `App Review` option in the sidebar and click `Permissions and Features`. Scroll down to find the `public_profile` option and click the `Get Advanced Access` button, then do the same for the `email` option. The page should now look like this:
+
+![Permissions and Features](https://curriculum-content.s3.amazonaws.com/omniauth-readme/permissions-and-features.png)
+
+Next, expand the `Settings` cog at the top of the sidebar and click `Basic`. Keep this page handy because we'll need those `App ID` and `App Secret` values in a minute, but first...
 
 ### `dotenv-rails`
 
