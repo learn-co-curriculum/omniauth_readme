@@ -1,3 +1,5 @@
 *.sqlite3
 *.log
-tmp/Gemfile.lock
+tmp/
+Gemfile.lock
+.env
