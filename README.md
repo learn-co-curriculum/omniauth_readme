@@ -7,16 +7,21 @@
 3. Use OmniAuth to handle authentication in a Rails server.
 
 There are no tests for this lesson, but code along as we learn about OmniAuth
-and build out a login strategy together!
+and build out a login strategy together! To get started, run:
 
-**_NOTE_**: If you run into trouble with Facebook, use the usual avenues for
-assistance (Google, StackOverflow, AAQ, Slack, and so on), but don't bash your
-head against the wall too much. Facebook is the choice for this lesson because
-it is ubiquitous as an OAuth provider, but feel free to pick a different
-provider (GitHub, for instance). A bit of struggle in the setup process is
-healthy — that's a learning opportunity. However, the ultimate point of this
-lesson is to learn how to use OmniAuth; not to waste six hours fighting with the
-Facebook developer interface.
+```console
+$ bundle install
+$ rails db:migrate
+```
+
+> **_NOTE_**: If you run into trouble with GitHub, use the usual avenues for
+> assistance (Google, StackOverflow, Pair with a TC, Slack, and so on), but
+> don't bash your head against the wall too much. GitHub is the choice for this
+> lesson because it is ubiquitous as an OAuth provider, but feel free to pick a
+> different provider (Google, for instance). A bit of struggle in the setup
+> process is healthy — that's a learning opportunity. However, the ultimate
+> point of this lesson is to learn how to use OmniAuth; not to waste six hours
+> fighting with the GitHub developer interface.
 
 ## Overview
 
@@ -61,8 +66,8 @@ applications.
 [OmniAuth][omniauth] is a gem for Rails that lets you use multiple
 authentication providers alongside the more traditional username/password setup.
 'Provider' is the most common term for an authentication partner, but within the
-OmniAuth universe we refer to providers (e.g., using a Facebook account to log
-in) as _strategies_. The OmniAuth wiki keeps [an up-to-date list of
+OmniAuth universe we refer to providers (e.g., using a GitHub account to log in)
+as _strategies_. The OmniAuth wiki keeps [an up-to-date list of
 strategies][list_of_strategies], both official (provided directly by the
 service, such as GitHub, Heroku, and SoundCloud) and unofficial (maintained by
 an unaffiliated developer, such as Facebook, Google, and Twitter).
@@ -85,7 +90,7 @@ Here's how OmniAuth works from the user's standpoint:
 
 Let's see how this works in practice.
 
-## OmniAuth with Facebook
+## OmniAuth with GitHub
 
 The OmniAuth gem allows us to use the OAuth protocol with a number of different
 providers. All we need to do is add the OmniAuth gem _and_ the provider-specific
@@ -94,18 +99,14 @@ only the provider-specific gem will suffice because it will install the OmniAuth
 gem as a dependency, but it's safer to add both — the shortcut is far from
 universal.
 
-In this case, let's add `omniauth` and `omniauth-facebook` to the Gemfile. Due
-to recent changes to the `omniauth` gem we need to add one additional gem to our
-`Gemfile`: `omniauth-rails_csrf_protection`. Once you've added all three gems,
-run `bundle install`. If we were so inclined, we could add additional OmniAuth
-gems to our heart's content, offering login via multiple providers in our app.
+In this case, let's add a few gems to the Gemfile by running:
 
-**_Note:_** If running `bundle install` gives you an error with installing
-`thin`, run the following:
-
-```sh
-gem install thin -- --with-cflags="-Wno-error=implicit-function-declaration"
+```console
+$ bundle add omniauth omniauth-github omniauth-rails_csrf_protection
 ```
+
+If we were so inclined, we could add additional OmniAuth gems to our heart's
+content, offering login via multiple providers in our app.
 
 Next, we'll need to tell OmniAuth about our app's OAuth credentials. Create a
 file named `config/initializers/omniauth.rb`. It will contain the following
@@ -113,14 +114,13 @@ lines:
 
 ```ruby
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :facebook, ENV['FACEBOOK_KEY'], ENV['FACEBOOK_SECRET']
+  provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET']
 end
 ```
 
 The code is unfamiliar, but we can guess what's going on from the
 characteristically clear Rails syntax. We're telling our Rails app to use a
-piece of middleware created by OmniAuth for the Facebook authentication
-strategy.
+piece of middleware created by OmniAuth for the GitHub authentication strategy.
 
 ### `ENV`
 
@@ -134,45 +134,21 @@ some kind of `4xx` error because the provider doesn't recognize the app's
 credentials (because they're evaluating to `nil`).
 
 As you can gather from the initializer code, we're going to need two pieces of
-information from Facebook in order to get authentication working: the
-application key and secret that will identify our app to Facebook.
+information from GitHub in order to get authentication working: the application
+key and secret that will identify our app to GitHub.
 
-Log in to [the Facebook developer site](https://developers.facebook.com/). Click
-on `My Apps` at the top right of the page, then click `Create App`. In the modal
-that appears, select `Consumer` and click `Continue`.
+Follow these instructions to create an OAuth app on GitHub:
 
-![Select App Type](https://curriculum-content.s3.amazonaws.com/omniauth-readme/select_app_type.png)
+- [Creating an OAuth App](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app)
 
-Give your app a display name and click `Create App`. In the dashboard that
-appears, click `Set Up` on the `Facebook Login` tile:
+You'll need to enter a few settings as you're creating the app:
 
-![Facebook Login](https://curriculum-content.s3.amazonaws.com/omniauth-readme/app_create_dashboard.png)
+- **Homepage URL**: `http://localhost:3000`
+- **Authorization callback URL**: `http://localhost:3000/auth/github/callback`
 
-Choose the `Web` option, and enter `https://localhost:3000/` when it prompts you
-for your `Site URL`. Click `Save`, and then click on `Settings` under the
-`Facebook Login` heading in the sidebar:
-
-![Facebook Login Settings](https://curriculum-content.s3.amazonaws.com/omniauth-readme/facebook_login_settings.png)
-
-In the `Valid OAuth redirect URIs` field, enter
-`https://localhost:3000/auth/facebook/callback`, which is the default callback
-endpoint for the `omniauth-facebook` strategy:
-
-![Valid OAuth redirect URIs](https://user-images.githubusercontent.com/9666939/61841353-b2fcb280-ae51-11e9-841b-ab031364588c.png)
-
-(Note: as of March 2018, Facebook requires `https` URIs for redirects. Make sure
-to prepend your `Valid OAuth Redirect URIs` with `https`.)
-
-Click `Save Changes`, then expand the `App Review` option in the sidebar and
-click `Permissions and Features`. Scroll down to find the `public_profile`
-option and click the `Get Advanced Access` button, then do the same for the
-`email` option. The page should now look like this:
-
-![Permissions and Features](https://curriculum-content.s3.amazonaws.com/omniauth-readme/permissions-and-features.png)
-
-Next, expand the `Settings` cog at the top of the sidebar and click `Basic`.
-Keep this page handy because we'll need those `App ID` and `App Secret` values
-in a minute, but first...
+After clicking "Register Application", you'll be taken to a settings page for
+your newly created app. Leave this page open — we'll need some info from this
+page in the next step.
 
 ### `dotenv-rails`
 
@@ -181,44 +157,41 @@ going to let an awesome gem handle the hard work for us. `dotenv-rails` is one
 of the best ways to ensure that environment variables are correctly loaded into
 the `ENV` hash in a secure manner. Using it requires four steps:
 
-1. Add `dotenv-rails` to your Gemfile and `bundle install`.
+1. Run `bundle add dotenv-rails` add the `dotenv-rails` gem to your Gemfile
 2. Create a file named `.env` at the root of your application (in this case,
    inside the `omniauth_readme/` directory).
-3. Add your Facebook app credentials to the newly created `.env` file
+3. Add your GitHub app credentials to the newly created `.env` file
 4. Add `.env` to your `.gitignore` file to ensure that you don't accidentally
    commit your precious credentials.
 
-For step three, take the `App ID` and `App Secret` values from the Facebook
-basic settings page you opened earlier...
-![Facebook App Dashboard](https://curriculum-content.s3.amazonaws.com/omniauth-readme/app_id_and_secret.png)
+For step three, take the `Client ID` and generate a `Client Secret` on the
+GitHub settings page, and paste them into the `.env` file as follows:
 
-...and paste them into the `.env` file as follows:
-
-```ruby
-FACEBOOK_KEY=247632982388118
-FACEBOOK_SECRET=01ab234567890c123d456ef78babc901
+```txt
+GITHUB_KEY=d739af6d68fb498fb492
+GITHUB_SECRET=ac5dabbec764a22e2b79eab98425cda7b01b21ca
 ```
 
 ### Routing OAuth flow in your application
 
-We now need to create a link that will initiate the Facebook OAuth process. The
+We now need to create a link that will initiate the GitHub OAuth process. The
 standard OmniAuth path is `/auth/:provider`, so, in this case, we'll need a link
-to `/auth/facebook`. Let's add one to `app/views/welcome/home.html.erb`:
+to `/auth/github`. Let's add one to `app/views/welcome/home.html.erb`:
 
 ```erb
-<%= link_to('Log in with Facebook!', '/auth/facebook', method: :post) %>
+<%= link_to('Log in with GitHub!', '/auth/github', method: :post) %>
 ```
 
 Next, we're going to need a `User` model and a `SessionsController` to track
-users who log in via Facebook. The `User` model should have four attributes, all
-strings: `name`, `email`, `image`, and `uid` (the user's ID on Facebook).
+users who log in via GitHub. The `User` model should have four attributes, all
+strings: `name`, `email`, `image`, and `uid` (the user's ID on GitHub).
 
 To handle user sessions, we need to create a single route, `sessions#create`,
-which is where Facebook will redirect users in the callback phase of the login
+which is where GitHub will redirect users in the callback phase of the login
 process. Add the following to `config/routes.rb`:
 
 ```ruby
-get '/auth/facebook/callback' => 'sessions#create'
+get '/auth/github/callback' => 'sessions#create'
 ```
 
 Our `SessionsController` will be pretty simplistic, with a lone action (and a
@@ -248,138 +221,76 @@ end
 ```
 
 And, finally, since we're re-rendering the `welcome#home` view upon logging in
-via Facebook, let's add a control flow to display user data if the user is
-logged in and the login link otherwise:
+via GitHub, let's add a control flow to display user data if the user is logged
+in and the login link otherwise:
 
 ```erb
 <% if session[:user_id] %>
   <h1><%= @user.name %></h1>
   <h2>Email: <%= @user.email %></h2>
-  <h2>Facebook UID: <%= @user.uid %></h2>
+  <h2>GitHub UID: <%= @user.uid %></h2>
   <img src="<%= @user.image %>">
 <% else %>
-  <%= link_to('Log in with Facebook!', '/auth/facebook', method: :post) %>
+  <%= link_to('Log in with GitHub!', '/auth/github', method: :post) %>
 <% end %>
 ```
 
-Now it's time to test it out! It's best to log out of Facebook prior to clicking
-the login link — that way, you'll see the full login flow.
+Now it's time to test it out! It's best to log out of GitHub prior to clicking
+the login link — that way, you'll see the full login flow. Run `rails s` to
+start the app, then navigate to [http://localhost:3000](http://localhost:3000).
 
-In order to ensure Rails is using https, do the following to start the server
-instead of our normal `rails s` flow:
+When you click the link, you should be prompted log in to GitHub and then to
+give the app access to your GitHub account.
 
-`thin start --ssl`
-
-Then navigate to [https://localhost:3000](https://localhost:3000).
-
-![fboauth-08](https://user-images.githubusercontent.com/16994388/51709344-bf5f9a00-1feb-11e9-986c-31df9076d768.png)
-
-When you click the link, you should be prompted log in to Facebook and then to
-give the app access to your Facebook account.
-
-![fboauth-09](https://user-images.githubusercontent.com/16994388/51709345-bff83080-1feb-11e9-9ead-8dafd5158d84.png)
-
-![fboauth-10](https://user-images.githubusercontent.com/16994388/51709346-bff83080-1feb-11e9-9287-264e18eea6bc.png)
-
-If everything is working correctly, you should then see your Facebook
-information displayed in the browser:
-
-![fboauth-12](https://user-images.githubusercontent.com/16994388/51709347-bff83080-1feb-11e9-8918-ecefe18847b1.png)
-
-**Note:** In the `application.rb` file, there is a line with
-`config.force_ssl = true`, which _forces all access to the app over SSL, uses
-Strict-Transport-Security, and uses secure cookies_. This line has been
-commented out so that the lab may work properly, and not cause students to get
-hung up on debugging and having issues with other labs. Chrome would cache the
-HTTPS protocol for the localhost domain, and only clearing the cache would work.
-However, in practice, it is still recommended to use `ssl` in OmniAuth
-applications.
+If everything is working correctly, you should then see your GitHub information
+displayed in the browser!
 
 #### A man, a plan, a param, Panama
 
-Upon clicking the link, your browser sends a `GET` request to the
-`/auth/facebook` route, which OmniAuth intercepts and redirects to a Facebook
-login screen with a ridiculously long URI:
+Upon clicking the link, your browser sends a `POST` request to the
+`/auth/github` route, which OmniAuth intercepts and redirects to a GitHub login
+screen with a ridiculously long URI:
 
-```
-https://www.facebook.com/login.php?skip_api_login=1&api_key=247632982388118&signed_next=1&next=https%3A%2F%2Fwww.facebook.com%2Fv2.9%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3000%252Fauth%252Ffacebook%252Fcallback%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%26scope%3Demail%26response_type%3Dcode%26client_id%3D247632982388118%26ret%3Dlogin%26logger_id%3Dd31c6728-d017-cee3-503d-5fe1bb6d8ad3&cancel_url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Ffacebook%2Fcallback%3Ferror%3Daccess_denied%26error_code%3D200%26error_description%3DPermissions%2Berror%26error_reason%3Duser_denied%26state%3Df4033bf06e2c3d74f1e65367e9c1651e2bde5487d5a7ca8d%23_%3D_&display=page&locale=en_US&logger_id=d31c6728-d017-cee3-503d-5fe1bb6d8ad3`
+```txt
+https://github.com/login/oauth/authorize?client_id=d739af6d68fb498fb492&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fgithub%2Fcallback&response_type=code&state=913d5b0d9c9204efea1652fc4d066605ae0bebc937fd73af
 ```
 
 The URI has a ton of [encoded](http://ascii.cl/url-encoding.htm) parameters, but
 we can parse through them to get an idea of what's actually being communicated.
 
-Right away, we see our Facebook application key, `api_key=247632982388118`, and
-the Facebook API endpoint that the login flow will send us to next:
-`next=https://www.facebook.com/v2.9/dialog/oauth`. At that point, there are
-divergent paths, one for successful login:
-
-- `redirect_uri=https://localhost:3000/auth/facebook/callback` — If login
-  succeeds, we'll be redirected to our server's OmniAuth callback route.
-
-- `scope=email` — This tells Facebook that we want to receive the user's
-  registered email address in the login response. We didn't have to configure
-  anything (`scope=email` is the default), but if you want to request other
-  specific pieces of user data check out
-  [the `omniauth-facebook` documentation](https://github.com/mkdynamic/omniauth-facebook#configuring).
-
-- `client_id=247632982388118` — There's our application key again, this time
-  provided to the success callback.
-
-And one for failure:
-
-- `cancel_url=https://localhost:3000/auth/facebook/callback` — If login fails,
-  we'll also be redirected to our server's OmniAuth callback route. However,
-  this time there are some nested encoded parameters that provide information
-  about the failure:
-
-  - `error=access_denied`
-  - `error_code=200`
-  - `error_description=Permissions error`
-  - `error_reason=user_denied`
+We see our GitHub client ID, `client_id=d739af6d68fb498fb492`, and the
+authorization callback url that the login flow will send us to next:
+`redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fgithub`.
 
 #### Inspecting the returned authentication data
 
-If you want to inspect the exact information that Facebook returns to our
+If you want to inspect the exact information that GitHub returns to our
 application about a logged-in user, throw a `binding.pry` in the
 `SessionsController#create` method and call `auth` inside the Pry session:
 
-```bash
+```txt
      2: def create
-     3:   @user = User.find_or_create_by(uid: auth['uid']) do |u|
-     4:     u.name = auth['info']['name']
-     5:     u.email = auth['info']['email']
-     6:     u.image = auth['info']['image']
-     7:   end
-     8:
- =>  9:   binding.pry
+ =>  3:   binding.pry
+     4:   @user =
+     5:     User.find_or_create_by(uid: auth['uid']) do |u|
+     6:       u.name = auth['info']['name']
+     7:       u.email = auth['info']['email']
+     8:       u.image = auth['info']['image']
+     9:     end
     10:
-    11:   session[:user_id] = @user.id
-    12:
-    13:   render 'welcome/home'
-    14: end
-
 [1] pry(#<SessionsController>)> auth
-=> {"provider"=>"facebook",
- "uid"=>"123456789012345",
+=> {"provider"=>"github",
+ "uid"=>"39830572",
  "info"=>
-  {"email"=>"mary@poppins.com",
-   "name"=>"Mary Poppins",
-   "image"=>"http://graph.facebook.com/v2.6/123456789012345/picture"},
- "credentials"=>
-  {"token"=>
-    "ABCDaEFbcGHIJKLMNdlOPeQRfSTUVWgXf1hYiZAjBkClDEmFG234n5oH6p7IJqKr0stLMNuOPQRv86S47TUVWX1YZwABCDxyz2EabcdFGeH4IfgJK9hLi0jM1kNOPQlRmn1oSTUp5qr7VWstuXvYZwxAByza807CbD9c3defEFGghijkHIJK",
-   "expires_at"=>1503263133,
-   "expires"=>true},
- "extra"=>
-  {"raw_info"=>
-    {"name"=>"Mary Poppins",
-     "email"=>"mary@poppins.com",
-     "id"=>"123456789012345"}}}
+  {"nickname"=>"ihollander",
+   "email"=>nil,
+   "name"=>"Ian Hollander",
+   "image"=>"https://avatars.githubusercontent.com/u/39830572?v=4"
 ```
 
-When you make a server-side API call (as we did), Facebook will provide an
-access token that's good for about two months, so you don't have to bug your
-users very often. That's good!
+When you make a server-side API call (as we did), GitHub will provide an access
+token that's good for about two months, so you don't have to bug your users very
+often. That's good!
 
 ## Conclusion
 
