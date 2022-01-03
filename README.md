@@ -6,8 +6,13 @@
 2. Explain an OmniAuth strategy.
 3. Use OmniAuth to handle authentication in a Rails server.
 
-There are no tests for this lesson, but code along as we learn about OmniAuth
-and build out a login strategy together! To get started, run:
+There are no tests for this lesson, but you can code along as we learn about
+OmniAuth and build out a login strategy together!
+
+This lesson comes with some starter code for a Rails app, including a `User`
+model and migrations.
+
+Run the following to set up the application so you can code along:
 
 ```console
 $ bundle install
